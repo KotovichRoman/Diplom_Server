@@ -9,6 +9,9 @@ import { UserModule } from './user/user.module';
 import { ChatModule } from './chat/chat.module';
 import { ChatUsersModule } from './chat-users/chat-users.module';
 import { MessageModule } from './message/message.module';
+import { AuthModule } from './auth/auth.module';
+import { MailModule } from './mail/mail.module';
+import { TaskLogModule } from './task-log/task-log.module';
 
 @Module({
   imports: [
@@ -32,6 +35,9 @@ import { MessageModule } from './message/message.module';
     ChatModule,
     ChatUsersModule,
     MessageModule,
+    AuthModule,
+    MailModule,
+    TaskLogModule,
   ],
 })
 export class AppModule {

@@ -22,7 +22,7 @@ export class MessageService {
 
   async findByChatId(chatId: number): Promise<Message[]> {
     return await this.messageRepository.find({
-      relations: ['chat'],
+      relations: ['chat', 'user'],
       where: {
         chat: {
           id: chatId,

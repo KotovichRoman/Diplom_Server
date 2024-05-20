@@ -16,7 +16,9 @@ export class Section {
   @Column()
   name: string;
 
-  @OneToMany(() => Task, (task) => task.section)
+  @OneToMany(() => Task, (task) => task.section, {
+    cascade: ['insert', 'update', 'remove'],
+  })
   tasks: Task[];
 
   @ManyToOne(() => Project, (project) => project.sections)

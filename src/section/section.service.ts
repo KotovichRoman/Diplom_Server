@@ -4,6 +4,7 @@ import { Section } from './entity/section.entity';
 import { Repository } from 'typeorm';
 import { CreateSectionDto } from './dto/create-section.dto';
 import { ProjectService } from 'src/project/project.service';
+import { UpdateSectionDto } from './dto/update-section.dto';
 
 @Injectable()
 export class SectionService {
@@ -22,6 +23,35 @@ export class SectionService {
     return await this.sectionRepository.findOne({ where: { id: id } });
   }
 
+  async findWithFilters(
+    projectId: number,
+    userId?: number,
+    priority?: string,
+    search?: string,
+  ): Promise<Section[]> {
+    const query = this.sectionRepository
+      .createQueryBuilder('section')
+      .leftJoinAndSelect('section.project', 'project')
+      .leftJoinAndSelect('section.tasks', 'task')
+      .leftJoin('task.users', 'user')
+      .where('project.id = :projectId', { projectId })
+      .select(['section', 'project', 'task']);
+
+    if (userId) {
+      query.andWhere('user.id = :userId', { userId });
+    }
+
+    if (priority) {
+      query.andWhere('task.priority = :priority', { priority });
+    }
+
+    if (search) {
+      query.andWhere('task.name Like :search', { search: `%${search}%` });
+    }
+
+    return await query.getMany();
+  }
+
   async create(createSectionDto: CreateSectionDto): Promise<Section> {
     const newSection: Section =
       await this.sectionRepository.create(createSectionDto);
@@ -29,5 +59,20 @@ export class SectionService {
       createSectionDto.projectId,
     );
     return await this.sectionRepository.save(newSection);
+  }
+
+  async update(
+    id: number,
+    updateSectionDto: UpdateSectionDto,
+  ): Promise<Section> {
+    const section: Section = await this.sectionRepository.findOne({
+      where: { id: id },
+    });
+    section.name = updateSectionDto.name;
+    return await this.sectionRepository.save(section);
+  }
+
+  async delete(id: number): Promise<void> {
+    await this.sectionRepository.delete(id);
   }
 }

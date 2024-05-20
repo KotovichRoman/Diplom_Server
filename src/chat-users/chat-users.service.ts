@@ -31,4 +31,8 @@ export class ChatUsersService {
       await this.chatUsersRepository.save(chatUsers);
     });
   }
+
+  async delete(userId: number): Promise<void> {
+    await this.chatUsersRepository.delete(userId);
+  }
 }

@@ -1,13 +1,22 @@
 import { Chat } from 'src/chat/entities/chat.entity';
 import { User } from 'src/user/entities/user.entity';
-import { Entity, PrimaryColumn, ManyToOne, JoinColumn, Column } from 'typeorm';
+import {
+  Entity,
+  ManyToOne,
+  JoinColumn,
+  Column,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
 export class ChatUsers {
-  @PrimaryColumn({ name: 'userId' })
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column({ name: 'userId', nullable: true })
   userId: number;
 
-  @PrimaryColumn({ name: 'chatId' })
+  @Column({ name: 'chatId', nullable: true })
   chatId: number;
 
   @Column({ default: true })
