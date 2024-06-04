@@ -49,7 +49,7 @@ export class Task {
   @Column({ default: true })
   inArchive: boolean = false;
 
-  @OneToMany(() => TaskLog, (taskLog) => taskLog.user)
+  @OneToMany(() => TaskLog, (taskLog) => taskLog.task)
   taskLogs: TaskLog[];
 
   @ManyToOne(() => Section, (section) => section.tasks)

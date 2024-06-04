@@ -25,11 +25,17 @@ export class Project {
   })
   startedAt: Date;
 
+  @Column({
+    type: 'timestamp',
+    nullable: true,
+  })
+  plannedEndedAt: Date;
+
   @DeleteDateColumn({
     type: 'timestamp',
     nullable: true,
   })
-  endedAt: Date;
+  factedEndedAt: Date;
 
   @OneToMany(() => Section, (section) => section.project)
   sections: Section[];

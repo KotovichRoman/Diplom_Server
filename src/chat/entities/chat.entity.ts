@@ -10,6 +10,9 @@ export class Chat {
   @Column()
   name: string;
 
+  @Column({ default: true })
+  solo: boolean = false;
+
   @OneToMany(() => Message, (message) => message.chat)
   messages: Message[];
 

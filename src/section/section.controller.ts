@@ -26,7 +26,7 @@ export class SectionController {
   ): Promise<Section[]> {
     return await this.sectionService.findWithFilters(
       projectId,
-      userId,
+      Number(userId),
       priority,
       search,
     );

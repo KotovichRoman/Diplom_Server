@@ -73,7 +73,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const message: Message = await this.messageService.create(payload);
     users.map(async (user) => {
       try {
-        const clientForSend: Socket = this.clients.get(user.userId);
+        console.log(user);
+        const clientForSend: Socket = this.clients.get(user.user.id);
         if (clientForSend != null) {
           clientForSend.emit('onCreateMessage', message);
         }
@@ -89,7 +90,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     senderClient: Socket,
     payload: CreateChatDto,
   ): Promise<void> {
-    const chat: Chat = await this.chatService.create(payload);
+    const userId = parseInt(senderClient.handshake.query.userId as string);
+    const chat: Chat = await this.chatService.create(userId, payload);
     await this.chatUsersService.create(payload.users, chat.id);
     payload.users.map(async (user) => {
       try {
@@ -102,5 +104,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         console.log('no receiver connected...');
       }
     });
+  }
+
+  @SubscribeMessage('checkSoloChat')
+  async handleCheckSoloChat(
+    senderClient: Socket,
+    payload: CreateChatDto,
+  ): Promise<void> {
+    const exists = await this.chatService.doesSoloChatExist(payload);
+    senderClient.emit('onCkeckSoloChat', exists);
   }
 }

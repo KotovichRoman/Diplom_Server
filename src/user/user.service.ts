@@ -45,7 +45,9 @@ export class UserService {
   }
 
   async findAllByIds(ids: number[]): Promise<User[]> {
-    return await this.userRepository.find({ where: { id: In(ids) } });
+    return await this.userRepository.find({
+      where: { id: In(ids) },
+    });
   }
 
   async findAllRoles(): Promise<Role[]> {

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Message } from './entities/message.entity';
@@ -10,8 +10,10 @@ import { UserService } from 'src/user/user.service';
 @Injectable()
 export class MessageService {
   constructor(
-    private readonly chatService: ChatService,
     private readonly userService: UserService,
+
+    @Inject(forwardRef(() => ChatService))
+    private readonly chatService: ChatService,
 
     @InjectRepository(Message)
     private messageRepository: Repository<Message>,
@@ -22,13 +24,17 @@ export class MessageService {
 
   async findByChatId(chatId: number): Promise<Message[]> {
     return await this.messageRepository.find({
-      relations: ['chat', 'user'],
+      relations: ['chat', 'user', 'messageType'],
       where: {
         chat: {
           id: chatId,
         },
       },
     });
+  }
+
+  async findOneTypeByName(name: string): Promise<MessageType> {
+    return await this.messageTypeRepository.findOne({ where: { name: name } });
   }
 
   async create(createMessageDto: CreateMessageDto): Promise<Message> {

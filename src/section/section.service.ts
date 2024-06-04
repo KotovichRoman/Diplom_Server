@@ -29,27 +29,37 @@ export class SectionService {
     priority?: string,
     search?: string,
   ): Promise<Section[]> {
-    const query = this.sectionRepository
+    const sections = await this.sectionRepository
       .createQueryBuilder('section')
       .leftJoinAndSelect('section.project', 'project')
-      .leftJoinAndSelect('section.tasks', 'task')
-      .leftJoin('task.users', 'user')
       .where('project.id = :projectId', { projectId })
-      .select(['section', 'project', 'task']);
+      .leftJoinAndSelect('section.tasks', 'task')
+      .leftJoinAndSelect('task.users', 'user')
+      .leftJoinAndSelect('task.taskLogs', 'taskLogs')
+      .leftJoinAndSelect('taskLogs.taskLogType', 'taskLogType')
+      .getMany();
 
-    if (userId) {
-      query.andWhere('user.id = :userId', { userId });
+    for (const section of sections) {
+      const filteredTasks = section.tasks.filter((task) => {
+        let matches = true;
+
+        if (userId && !task.users.some((user) => user.id === userId)) {
+          matches = false;
+        }
+        if (priority && task.priority !== priority) {
+          matches = false;
+        }
+        if (search && !task.name.includes(search)) {
+          matches = false;
+        }
+
+        return matches;
+      });
+
+      section.tasks = filteredTasks;
     }
 
-    if (priority) {
-      query.andWhere('task.priority = :priority', { priority });
-    }
-
-    if (search) {
-      query.andWhere('task.name Like :search', { search: `%${search}%` });
-    }
-
-    return await query.getMany();
+    return sections;
   }
 
   async create(createSectionDto: CreateSectionDto): Promise<Section> {

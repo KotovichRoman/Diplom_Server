@@ -26,6 +26,7 @@ import { TaskLogModule } from './task-log/task-log.module';
       schema: `${process.env.POSTGRES_SCHEMA}`,
       autoLoadEntities: true,
       synchronize: true,
+      logging: true,
       migrations: ['../migration/*{.ts,.js}'],
     }),
     TaskModule,

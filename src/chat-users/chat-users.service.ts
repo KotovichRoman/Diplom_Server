@@ -18,18 +18,23 @@ export class ChatUsersService {
   ) {}
 
   async findUsersByChatId(chatId: number): Promise<ChatUsers[]> {
-    return await this.chatUsersRepository.find({ where: { chatId: chatId } });
+    return await this.chatUsersRepository.find({
+      where: { chat: await this.chatService.findOne(chatId) },
+      relations: { chat: true, user: true },
+    });
   }
 
   async create(usersId: number[], chatId: number): Promise<void> {
     const users: User[] = await this.userService.findAllByIds(usersId);
     const chat: Chat = await this.chatService.findOne(chatId);
-    const chatUsers: ChatUsers = new ChatUsers();
-    chatUsers.chat = chat;
-    users.map(async (user) => {
-      chatUsers.user = user;
-      await this.chatUsersRepository.save(chatUsers);
-    });
+    await Promise.all(
+      users.map(async (user) => {
+        const chatUsers: ChatUsers = new ChatUsers();
+        chatUsers.chat = chat;
+        chatUsers.user = user;
+        await this.chatUsersRepository.save(chatUsers);
+      }),
+    );
   }
 
   async delete(userId: number): Promise<void> {
